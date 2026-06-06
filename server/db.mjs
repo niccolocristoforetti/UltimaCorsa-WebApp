@@ -151,4 +151,16 @@ if (db.prepare('SELECT COUNT(*) AS n FROM stations').get().n === 0) {
   console.log('Database creato e popolato.');
 }
 
+// --- Query per l'autenticazione ---
+
+// Utente completo (con hash e salt): serve a verificare la password al login.
+export function getUserByUsername(username) {
+  return db.prepare('SELECT * FROM users WHERE username = ?').get(username);
+}
+
+// Solo i campi sicuri (NO hash/salt): usato da deserializeUser per popolare req.user.
+export function getUserById(id) {
+  return db.prepare('SELECT id, username FROM users WHERE id = ?').get(id);
+}
+
 export default db;
