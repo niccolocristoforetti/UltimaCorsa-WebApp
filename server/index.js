@@ -44,7 +44,33 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());
 
-// Rotte API
+// Blocca le richieste non autenticate sulle rotte riservate.
+function isLoggedIn(req, res, next) {
+  if (req.isAuthenticated()) return next();
+  return res.status(401).json({ error: 'Non autenticato' });
+}
+
+// Login: verifico le credenziali e, se valide, apro la sessione.
+app.post('/api/sessions', (req, res, next) => {
+  passport.authenticate('local', (err, user, info) => {
+    if (err) return next(err);
+    if (!user) return res.status(401).json({ error: info?.message });
+    req.login(user, (err) => {
+      if (err) return next(err);
+      return res.json(req.user);
+    });
+  })(req, res, next);
+});
+
+// Utente loggato corrente (401 se nessuno è loggato).
+app.get('/api/sessions/current', isLoggedIn, (req, res) => {
+  res.json(req.user);
+});
+
+// Logout: chiudo la sessione corrente.
+app.delete('/api/sessions/current', (req, res) => {
+  req.logout(() => res.end());
+});
 
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);

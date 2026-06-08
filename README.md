@@ -10,16 +10,16 @@
 
 ## API Server
 
-- POST `/api/something`
-  - request parameters and request body content
-  - response body content
-- GET `/api/something`
-  - request parameters
-  - response body content
-- POST `/api/something`
-  - request parameters and request body content
-  - response body content
-- ...
+### Autenticazione
+- POST `/api/sessions` - login.
+  - body: `{ username, password }`
+  - risposta: `{ id, username }` dell'utente, oppure `401` con messaggio se le credenziali sono errate.
+- GET `/api/sessions/current` - restituisce l'utente attualmente loggato.
+  - nessun parametro
+  - risposta: `{ id, username }` se autenticato, altrimenti `401`.
+- DELETE `/api/sessions/current` - logout dell'utente corrente.
+  - nessun parametro
+  - risposta: `200` senza corpo.
 
 ## Database Tables
 
