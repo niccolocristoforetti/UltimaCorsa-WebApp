@@ -5,7 +5,12 @@ import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import crypto from 'crypto';
 // L'import di db.mjs inizializza schema e dati (il seed parte solo se il DB è vuoto).
-import { getUserByUsername, getUserById } from './db.mjs';
+import { getUserByUsername, getUserById, getStations, getLinesWithStations, createGame } from './db.mjs';
+import { buildAdjacency, bfsDistances, lineSegments } from './graph.js';
+
+// La rete è fissa per tutta la vita del server: costruisco grafo e tratte una volta sola.
+const adjacency = buildAdjacency();
+const segments = [...lineSegments().keys()].map((k) => k.split('-').map(Number));
 
 // Autenticazione locale: username + password verificata con scrypt e sale.
 passport.use(new LocalStrategy((username, password, done) => {
@@ -70,6 +75,31 @@ app.get('/api/sessions/current', isLoggedIn, (req, res) => {
 // Logout: chiudo la sessione corrente.
 app.delete('/api/sessions/current', (req, res) => {
   req.logout(() => res.end());
+});
+
+// Mappa completa (fase di Setup): stazioni e linee con l'ordine di percorrenza.
+app.get('/api/network/full', isLoggedIn, (req, res) => {
+  res.json({ stations: getStations(), lines: getLinesWithStations() });
+});
+
+// Vista per la Pianificazione: stazioni e tratte, volutamente SENZA le linee.
+// Ricostruire la rete a memoria è il cuore del gioco.
+app.get('/api/network/segments', isLoggedIn, (req, res) => {
+  res.json({ stations: getStations(), segments });
+});
+
+// Nuova partita: il server assegna partenza e arrivo casuali a distanza >= 3 tratte.
+app.post('/api/games', isLoggedIn, (req, res) => {
+  const stations = getStations();
+  const start = stations[Math.floor(Math.random() * stations.length)];
+  // Le distanze BFS da start: ogni stazione della rete ha almeno una candidata a
+  // distanza >= 3 (il raggio dell'albero è superiore), quindi la scelta esiste sempre.
+  const dist = bfsDistances(adjacency, start.id);
+  const candidates = stations.filter((s) => (dist.get(s.id) ?? 0) >= 3);
+  const end = candidates[Math.floor(Math.random() * candidates.length)];
+
+  const game = createGame(req.user.id, start.id, end.id);
+  res.json({ id: game.id, start, end });
 });
 
 app.listen(port, () => {

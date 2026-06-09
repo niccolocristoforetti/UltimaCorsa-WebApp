@@ -151,6 +151,36 @@ if (db.prepare('SELECT COUNT(*) AS n FROM stations').get().n === 0) {
   console.log('Database creato e popolato.');
 }
 
+// --- Query per la rete ---
+
+export function getStations() {
+  return db.prepare('SELECT id, name FROM stations').all();
+}
+
+// Linee con le rispettive stazioni in ordine di percorrenza (position).
+export function getLinesWithStations() {
+  const lines = db.prepare('SELECT id, name, color FROM lines').all();
+  const stmt = db.prepare(`
+    SELECT station_id FROM line_stations
+    WHERE line_id = ? ORDER BY position
+  `);
+  return lines.map((l) => ({
+    ...l,
+    stations: stmt.all(l.id).map((r) => r.station_id),
+  }));
+}
+
+// --- Query per le partite ---
+
+// Crea una partita in corso: lo score resta NULL finché non viene completata.
+export function createGame(userId, startId, endId) {
+  const info = db.prepare(`
+    INSERT INTO games (user_id, start_station_id, end_station_id)
+    VALUES (?, ?, ?)
+  `).run(userId, startId, endId);
+  return db.prepare('SELECT * FROM games WHERE id = ?').get(info.lastInsertRowid);
+}
+
 // --- Query per l'autenticazione ---
 
 // Utente completo (con hash e salt): serve a verificare la password al login.

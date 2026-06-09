@@ -21,6 +21,19 @@
   - nessun parametro
   - risposta: `200` senza corpo.
 
+### Rete metropolitana (richiedono autenticazione)
+- GET `/api/network/full` - mappa completa per la fase di Setup.
+  - nessun parametro
+  - risposta: `{ stations: [{id, name}], lines: [{id, name, color, stations: [id...]}] }` con le stazioni di ogni linea in ordine.
+- GET `/api/network/segments` - stazioni ed elenco delle tratte per la fase di Pianificazione, senza alcuna informazione sulle linee.
+  - nessun parametro
+  - risposta: `{ stations: [{id, name}], segments: [[idA, idB], ...] }`
+
+### Partite (richiedono autenticazione)
+- POST `/api/games` - crea una nuova partita; il server assegna casualmente partenza e arrivo a distanza di almeno 3 tratte.
+  - nessun body
+  - risposta: `{ id, start: {id, name}, end: {id, name} }`
+
 ## Database Tables
 
 - Tabella `stations` - le stazioni della rete (id, nome univoco).
