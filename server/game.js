@@ -1,4 +1,24 @@
 import { lineSegments, interchanges, segmentKey } from './graph.js';
+import { getEvents } from './db.mjs';
+
+// Esegue il viaggio su un percorso già validato: un evento casuale per tratta,
+// monete da 20 in giù/su, punteggio finale mai negativo (floor a 0).
+export function playRoute(route) {
+  const events = getEvents();
+  let coins = 20;
+  const legs = [];
+  for (let i = 1; i < route.length; i++) {
+    const event = events[Math.floor(Math.random() * events.length)];
+    coins += event.effect;
+    legs.push({
+      from: route[i - 1],
+      to: route[i],
+      event: { description: event.description, effect: event.effect },
+      coins,
+    });
+  }
+  return { legs, score: Math.max(0, coins) };
+}
 
 // Verifica che un percorso (array di id stazione) sia valido:
 //  1) parte da startId,

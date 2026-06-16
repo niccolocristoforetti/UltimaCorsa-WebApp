@@ -33,6 +33,12 @@
 - POST `/api/games` - crea una nuova partita; il server assegna casualmente partenza e arrivo a distanza di almeno 3 tratte.
   - nessun body
   - risposta: `{ id, start: {id, name}, end: {id, name} }`
+- POST `/api/games/:id/route` - invia il percorso costruito; il server lo valida (anche rispetto ai 90 secondi), estrae un evento casuale per tratta e calcola il punteggio.
+  - body: `{ route: [stationId, ...] }` (sequenza di stazioni, dalla partenza all'arrivo)
+  - risposta: `{ valid: true, legs: [{from, to, event: {description, effect}, coins}], score }` se il percorso è valido; `{ valid: false, score: 0 }` altrimenti (fase di esecuzione saltata).
+- GET `/api/leaderboard` - classifica generale: il miglior punteggio di ogni giocatore, in ordine decrescente.
+  - nessun parametro
+  - risposta: `[{ username, best }, ...]`
 
 ## Database Tables
 

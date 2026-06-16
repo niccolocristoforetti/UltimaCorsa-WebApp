@@ -5,8 +5,12 @@ import passport from 'passport';
 import { Strategy as LocalStrategy } from 'passport-local';
 import crypto from 'crypto';
 // L'import di db.mjs inizializza schema e dati (il seed parte solo se il DB è vuoto).
-import { getUserByUsername, getUserById, getStations, getLinesWithStations, createGame } from './db.mjs';
+import {
+  getUserByUsername, getUserById, getStations, getLinesWithStations,
+  createGame, getGameById, completeGame, getLeaderboard,
+} from './db.mjs';
 import { buildAdjacency, bfsDistances, lineSegments } from './graph.js';
+import { validateRoute, playRoute } from './game.js';
 
 // La rete è fissa per tutta la vita del server: costruisco grafo e tratte una volta sola.
 const adjacency = buildAdjacency();
@@ -100,6 +104,45 @@ app.post('/api/games', isLoggedIn, (req, res) => {
 
   const game = createGame(req.user.id, start.id, end.id);
   res.json({ id: game.id, start, end });
+});
+
+// Invio del percorso: valido tutto lato server (proprietà, tempo, regole) e,
+// se il percorso è buono, eseguo il viaggio estraendo un evento per tratta.
+app.post('/api/games/:id/route', isLoggedIn, (req, res) => {
+  const game = getGameById(Number(req.params.id));
+  // 404 anche per partite altrui: non rivelo l'esistenza di risorse non mie.
+  if (!game || game.user_id !== req.user.id) {
+    return res.status(404).json({ error: 'Partita non trovata' });
+  }
+  if (game.status !== 'playing') {
+    return res.status(409).json({ error: 'Partita già conclusa' });
+  }
+
+  const route = req.body?.route;
+  if (!Array.isArray(route) || !route.every(Number.isInteger)) {
+    return res.status(422).json({ error: 'Percorso malformato' });
+  }
+
+  // I 90 secondi vanno verificati qui, non solo nel client (created_at è UTC).
+  // Tolleranza di 5s per la latenza di rete e l'autosubmit allo scadere.
+  const elapsed = (Date.now() - new Date(game.created_at.replace(' ', 'T') + 'Z').getTime()) / 1000;
+  const inTime = elapsed <= 95;
+
+  const valid = inTime && validateRoute(route, game.start_station_id, game.end_station_id);
+  if (!valid) {
+    // Percorso invalido o fuori tempo: esecuzione saltata, si perdono le 20 monete.
+    completeGame(game.id, 0);
+    return res.json({ valid: false, score: 0 });
+  }
+
+  const { legs, score } = playRoute(route);
+  completeGame(game.id, score);
+  res.json({ valid: true, legs, score });
+});
+
+// Classifica generale: miglior punteggio di ogni giocatore, in ordine decrescente.
+app.get('/api/leaderboard', isLoggedIn, (req, res) => {
+  res.json(getLeaderboard());
 });
 
 app.listen(port, () => {

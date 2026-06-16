@@ -181,6 +181,29 @@ export function createGame(userId, startId, endId) {
   return db.prepare('SELECT * FROM games WHERE id = ?').get(info.lastInsertRowid);
 }
 
+export function getEvents() {
+  return db.prepare('SELECT id, description, effect FROM events').all();
+}
+
+export function getGameById(id) {
+  return db.prepare('SELECT * FROM games WHERE id = ?').get(id);
+}
+
+export function completeGame(id, score) {
+  db.prepare("UPDATE games SET status = 'completed', score = ? WHERE id = ?").run(score, id);
+}
+
+// Classifica generale: un solo dato per giocatore, il suo miglior punteggio.
+export function getLeaderboard() {
+  return db.prepare(`
+    SELECT u.username, MAX(g.score) AS best
+    FROM games g JOIN users u ON u.id = g.user_id
+    WHERE g.status = 'completed'
+    GROUP BY u.id
+    ORDER BY best DESC
+  `).all();
+}
+
 // --- Query per l'autenticazione ---
 
 // Utente completo (con hash e salt): serve a verificare la password al login.
