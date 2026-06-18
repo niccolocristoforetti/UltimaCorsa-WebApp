@@ -9,7 +9,9 @@ db.pragma('foreign_keys = ON');   // SQLite NON applica le FK di default: va acc
 db.exec(`
   CREATE TABLE IF NOT EXISTS stations (
     id   INTEGER PRIMARY KEY AUTOINCREMENT,
-    name TEXT    NOT NULL UNIQUE
+    name TEXT    NOT NULL UNIQUE,
+    x    INTEGER NOT NULL,                -- coordinate fisse per disegnare la mappa (la rete non cambia)
+    y    INTEGER NOT NULL
   );
 
   CREATE TABLE IF NOT EXISTS lines (
@@ -57,25 +59,39 @@ db.exec(`
 
 if (db.prepare('SELECT COUNT(*) AS n FROM stations').get().n === 0) {
 
-  // 1) Stazioni: inserisco e costruisco una mappa nome -> id (mai id hardcoded)
-  const stationNames = [
-    'Parona', 'Borgo Trento', 'Castelvecchio', 'Porta Nuova', 'Fiera',
-    'Corso Milano', 'San Zeno', 'Piazza Bra', 'Veronetta', 'Porta Vescovo',
-    'Borgo Venezia', 'Stadio Bentegodi', 'Santa Lucia', 'Borgo Roma',
-    'Quinzano', 'Avesa', 'Ponte Pietra', 'Grezzana',
+  // 1) Stazioni con coordinate: layout octolineare stile metro di Londra (solo segmenti a 0/45/90 gradi, passo regolare di 100), interscambi (Castelvecchio, Porta Nuova, Veronetta) sugli incroci, nessuna intersezione fuori da essi
+  const stationDefs = [
+    { name: 'Parona',           x: 100, y: 100 },
+    { name: 'Borgo Trento',     x: 200, y: 200 },
+    { name: 'Castelvecchio',    x: 300, y: 300 },
+    { name: 'Porta Nuova',      x: 300, y: 400 },
+    { name: 'Fiera',            x: 300, y: 500 },
+    { name: 'Corso Milano',     x: 100, y: 300 },
+    { name: 'San Zeno',         x: 200, y: 300 },
+    { name: 'Piazza Bra',       x: 400, y: 300 },
+    { name: 'Veronetta',        x: 500, y: 300 },
+    { name: 'Porta Vescovo',    x: 600, y: 300 },
+    { name: 'Borgo Venezia',    x: 700, y: 300 },
+    { name: 'Stadio Bentegodi', x: 100, y: 400 },
+    { name: 'Santa Lucia',      x: 200, y: 400 },
+    { name: 'Borgo Roma',       x: 400, y: 400 },
+    { name: 'Quinzano',         x: 200, y:   0 },
+    { name: 'Avesa',            x: 300, y: 100 },
+    { name: 'Ponte Pietra',     x: 400, y: 200 },
+    { name: 'Grezzana',         x: 600, y: 200 },
   ];
-  const insertStation = db.prepare('INSERT INTO stations (name) VALUES (?)');
+  const insertStation = db.prepare('INSERT INTO stations (name, x, y) VALUES (?, ?, ?)');
   const stationId = {};
-  for (const name of stationNames) {
-    stationId[name] = insertStation.run(name).lastInsertRowid;
+  for (const s of stationDefs) {
+    stationId[s.name] = insertStation.run(s.name, s.x, s.y).lastInsertRowid;
   }
 
   // 2) Linee: inserisco e costruisco mappa nome -> id
   const lineDefs = [
     { name: 'Gialla', color: '#f1c40f' },
-    { name: 'Blu',    color: '#2980b9' },
+    { name: 'Blu',    color: '#1a5276' },
     { name: 'Verde',  color: '#27ae60' },
-    { name: 'Nera',   color: '#2c3e50' },
+    { name: 'Nera',   color: '#000000' },
   ];
   const insertLine = db.prepare('INSERT INTO lines (name, color) VALUES (?, ?)');
   const lineId = {};
@@ -154,7 +170,7 @@ if (db.prepare('SELECT COUNT(*) AS n FROM stations').get().n === 0) {
 // --- Query per la rete ---
 
 export function getStations() {
-  return db.prepare('SELECT id, name FROM stations').all();
+  return db.prepare('SELECT id, name, x, y FROM stations').all();
 }
 
 // Linee con le rispettive stazioni in ordine di percorrenza (position).

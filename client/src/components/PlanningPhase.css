@@ -1,0 +1,19 @@
+.planning-phase {
+  width: 100%;
+  max-width: 900px;
+  margin: 32px auto;
+}
+
+.timer {
+  font-weight: bold;
+}
+
+.planning-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.planning-actions button {
+  padding: 8px 16px;
+}

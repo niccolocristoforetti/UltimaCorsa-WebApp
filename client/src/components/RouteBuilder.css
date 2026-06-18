@@ -1,0 +1,19 @@
+.route-builder {
+  margin-top: 24px;
+}
+
+.segment-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.segment-list button {
+  padding: 6px 12px;
+}
+
+.segment-list button.segment-selected {
+  background: #1a5276;
+  color: white;
+  border-color: #1a5276;
+}

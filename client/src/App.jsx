@@ -1,10 +1,11 @@
 import { useEffect } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Link } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext'
 import API from './API'
 import LoginForm from './components/LoginForm'
 import NavBar from './components/NavBar'
 import ProtectedRoute from './components/ProtectedRoute'
+import GamePage from './components/GamePage'
 
 function App() {
   const { setUser, loading, setLoading } = useAuth()
@@ -27,7 +28,8 @@ function App() {
       <NavBar />
       <Routes>
         <Route path="/login" element={<LoginForm />} />
-        <Route path="/"      element={<ProtectedRoute><div>Pagina principale</div></ProtectedRoute>} />
+        <Route path="/play"  element={<ProtectedRoute><GamePage /></ProtectedRoute>} />
+        <Route path="/"      element={<ProtectedRoute><Link to="/play">Gioca</Link></ProtectedRoute>} />
       </Routes>
     </>
   )

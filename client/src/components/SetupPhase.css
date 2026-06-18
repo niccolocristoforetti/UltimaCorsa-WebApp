@@ -1,0 +1,31 @@
+.setup-phase {
+  width: 100%;
+  max-width: 900px;
+  margin: 32px auto;
+}
+
+.legend {
+  display: flex;
+  justify-content: center;
+  gap: 24px;
+  margin-top: 12px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: bold;
+}
+
+.line-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.setup-phase button {
+  margin-top: 24px;
+  padding: 8px 16px;
+}

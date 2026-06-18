@@ -1,0 +1,27 @@
+.network-map {
+  width: 100%;
+  max-width: 860px;
+  max-height: 68vh;
+  display: block;
+  margin: 0 auto;
+}
+
+.network-line {
+  stroke-width: 7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.station-dot {
+  fill: white;
+  stroke: black;
+  stroke-width: 1.5;
+}
+
+.station-label {
+  font-size: 13px;
+}
+
+.station-label.interchange {
+  font-weight: 600;
+}

@@ -16,6 +16,16 @@ import { validateRoute, playRoute } from './game.js';
 const adjacency = buildAdjacency();
 const segments = [...lineSegments().keys()].map((k) => k.split('-').map(Number));
 
+// Mescola in una nuova copia, non tocca l'array originale.
+function shuffled(array) {
+  const copy = [...array];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
+}
+
 // Autenticazione locale: username + password verificata con scrypt e sale.
 passport.use(new LocalStrategy((username, password, done) => {
   const user = getUserByUsername(username);
@@ -87,9 +97,11 @@ app.get('/api/network/full', isLoggedIn, (req, res) => {
 });
 
 // Vista per la Pianificazione: stazioni e tratte, volutamente SENZA le linee.
-// Ricostruire la rete a memoria è il cuore del gioco.
+// Ricostruire la rete a memoria è il cuore del gioco. L'elenco arriva mescolato
+// (non raggruppato per linea) e in un ordine diverso ad ogni richiesta, altrimenti
+// memorizzare la posizione sullo schermo diventerebbe una scorciatoia.
 app.get('/api/network/segments', isLoggedIn, (req, res) => {
-  res.json({ stations: getStations(), segments });
+  res.json({ stations: getStations(), segments: shuffled(segments) });
 });
 
 // Nuova partita: il server assegna partenza e arrivo casuali a distanza >= 3 tratte.
