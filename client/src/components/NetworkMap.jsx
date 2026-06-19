@@ -1,6 +1,6 @@
 import './NetworkMap.css'
 
-// Per ogni stazione, da che parte sta l'etichetta rispetto al pallino (schema validato con le anteprime matplotlib)
+// Per ogni stazione, da che parte sta l'etichetta rispetto al pallino
 const ANCHOR = {
   'Corso Milano': 'above', 'San Zeno': 'above', 'Piazza Bra': 'above-right-near',
   'Porta Vescovo': 'above', 'Borgo Venezia': 'above',
@@ -20,10 +20,9 @@ const OFFSET = {
   right: { dx: 14, dy: 0, textAnchor: 'start', baseline: 'middle' },
 }
 
-// Mappa SVG della rete: stazioni come cerchi, posizionate con le coordinate fisse di db.mjs (asse Y già coerente con SVG, nessuna inversione necessaria)
-// lines è opzionale: presente nel Setup (disegno le linee colorate), assente in Pianificazione (solo i pallini)
+// Mappa SVG della rete: stazioni come cerchi, posizionate con le coordinate fisse di db.mjs (asse Y già coerente con SVG, nessuna inversione necessaria), lines è opzionale
 function NetworkMap({ stations, segments, lines }) {
-  // Grado di ogni stazione = quante tratte la toccano; nella rete fissa solo gli interscambi arrivano a 3+ (due linee che si incrociano), i passaggi sono 2 e i capolinea 1
+  // Grado di ogni stazione = quante tratte la toccano.
   const degree = {}
   for (const [a, b] of segments) {
     degree[a] = (degree[a] || 0) + 1
@@ -47,7 +46,7 @@ function NetworkMap({ stations, segments, lines }) {
       ))}
       {stations.map(s => {
         const { dx, dy, textAnchor, baseline } = OFFSET[ANCHOR[s.name]]
-        // In Pianificazione (lines assente) tengo tutte le stazioni uguali: evidenziare gli interscambi rivelerebbe un'informazione che il giocatore deve ricordare da solo
+        // Interscambio evidenziato solo se ho le linee
         const interchange = Boolean(lines) && (degree[s.id] || 0) >= 3
         return (
           <g key={s.id}>

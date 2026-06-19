@@ -2,9 +2,6 @@ import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import './Home.css'
 
-// Home: l'unica pagina visibile anche a chi non è loggato. Le istruzioni le mostro sempre (utili anche
-// a chi ha già un account); cambia solo l'area azioni in cima, in base a "user": bottoni di gioco se
-// loggato, invito al login se anonimo. Niente mappa, come richiesto per i visitatori anonimi
 function Home() {
   const { user } = useAuth()
   const navigate = useNavigate()

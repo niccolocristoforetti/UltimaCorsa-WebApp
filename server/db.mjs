@@ -14,7 +14,7 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS stations (
     id   INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT    NOT NULL UNIQUE,
-    x    INTEGER NOT NULL,                -- coordinate fisse per disegnare la mappa (la rete non cambia)
+    x    INTEGER NOT NULL,                -- coordinate fisse per disegnare la mappa
     y    INTEGER NOT NULL
   );
 
@@ -24,8 +24,7 @@ db.exec(`
     color TEXT    NOT NULL          -- hex per disegnare la linea sulla mappa
   );
 
-  -- Junction table: collega stazioni e linee dando un ORDINE (position).
-  -- Da qui derivano adiacenza, tratte e stazioni di interscambio.
+  -- Junction table: collega stazioni e linee dando un ordine
   CREATE TABLE IF NOT EXISTS line_stations (
     line_id    INTEGER NOT NULL REFERENCES lines(id),
     station_id INTEGER NOT NULL REFERENCES stations(id),
@@ -37,14 +36,14 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS events (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,
     description TEXT    NOT NULL,
-    effect      INTEGER NOT NULL CHECK (effect BETWEEN -4 AND 4)  -- vincolo della traccia nel DB
+    effect      INTEGER NOT NULL CHECK (effect BETWEEN -4 AND 4)
   );
 
   CREATE TABLE IF NOT EXISTS users (
     id       INTEGER PRIMARY KEY AUTOINCREMENT,
     username TEXT    NOT NULL UNIQUE,
-    hash     TEXT    NOT NULL,   -- password hashed (scrypt)
-    salt     TEXT    NOT NULL    -- sale per-utente
+    hash     TEXT    NOT NULL,
+    salt     TEXT    NOT NULL
   );
 
   CREATE TABLE IF NOT EXISTS games (
@@ -59,11 +58,10 @@ db.exec(`
   );
 `);
 
-// --- Seed (gira solo se il DB è vuoto) ---
+// Seed (se DB vuoto)
 
 if (db.prepare('SELECT COUNT(*) AS n FROM stations').get().n === 0) {
 
-  // 1) Stazioni con coordinate: layout octolineare stile metro di Londra (solo segmenti a 0/45/90 gradi, passo regolare di 100), interscambi (Castelvecchio, Porta Nuova, Veronetta) sugli incroci, nessuna intersezione fuori da essi
   const stationDefs = [
     { name: 'Parona',           x: 100, y: 100 },
     { name: 'Borgo Trento',     x: 200, y: 200 },
@@ -90,7 +88,6 @@ if (db.prepare('SELECT COUNT(*) AS n FROM stations').get().n === 0) {
     stationId[s.name] = insertStation.run(s.name, s.x, s.y).lastInsertRowid;
   }
 
-  // 2) Linee: inserisco e costruisco mappa nome -> id
   const lineDefs = [
     { name: 'Gialla', color: '#f1c40f' },
     { name: 'Blu',    color: '#1a5276' },
@@ -103,7 +100,7 @@ if (db.prepare('SELECT COUNT(*) AS n FROM stations').get().n === 0) {
     lineId[l.name] = insertLine.run(l.name, l.color).lastInsertRowid;
   }
 
-  // 3) line_stations: la rete come sequenze ORDINATE. La position è l'indice nell'array.
+  // line_stations: la rete come sequenze ordinate. La position è l'indice nell'array.
   const network = {
     Gialla: ['Parona', 'Borgo Trento', 'Castelvecchio', 'Porta Nuova', 'Fiera'],
     Blu:    ['Corso Milano', 'San Zeno', 'Castelvecchio', 'Piazza Bra', 'Veronetta', 'Porta Vescovo', 'Borgo Venezia'],
@@ -119,7 +116,6 @@ if (db.prepare('SELECT COUNT(*) AS n FROM stations').get().n === 0) {
     });
   }
 
-  // 4) Eventi (10, effetti distribuiti da -4 a +4)
   const events = [
     ['Riesci a prendere la coincidenza', 0],
     ['Una nonna in carrozza ti offre la pearà da passeggio', 1],
@@ -137,8 +133,6 @@ if (db.prepare('SELECT COUNT(*) AS n FROM stations').get().n === 0) {
     insertEvent.run(description, effect);
   }
 
-  // 5) Utenti (password hashed con scrypt + sale). Credenziali per il README:
-  //    valerio / catullo   |   romeo / montecchi   |   giulietta / capuleti
   const insertUser = db.prepare('INSERT INTO users (username, hash, salt) VALUES (?, ?, ?)');
   const userId = {};
   const seedUsers = [
@@ -152,7 +146,7 @@ if (db.prepare('SELECT COUNT(*) AS n FROM stations').get().n === 0) {
     userId[username] = insertUser.run(username, hash, salt).lastInsertRowid;
   }
 
-  // 6) Partite completate: giulietta e romeo hanno già giocato con successo
+  // Partite completate
   const insertGame = db.prepare(`
     INSERT INTO games (user_id, start_station_id, end_station_id, status, score, created_at)
     VALUES (?, ?, ?, 'completed', ?, ?)
@@ -171,7 +165,7 @@ if (db.prepare('SELECT COUNT(*) AS n FROM stations').get().n === 0) {
   console.log('Database creato e popolato.');
 }
 
-// --- Query per la rete ---
+// Query rete
 
 export function getStations() {
   return db.prepare('SELECT id, name, x, y FROM stations').all();
@@ -190,7 +184,7 @@ export function getLinesWithStations() {
   }));
 }
 
-// --- Query per le partite ---
+// Query partite
 
 // Crea una partita in corso: lo score resta NULL finché non viene completata.
 export function createGame(userId, startId, endId) {
@@ -213,7 +207,7 @@ export function completeGame(id, score) {
   db.prepare("UPDATE games SET status = 'completed', score = ? WHERE id = ?").run(score, id);
 }
 
-// Classifica generale: un solo dato per giocatore, il suo miglior punteggio.
+// Classifica generale: un solo dato per giocatore (personal best).
 export function getLeaderboard() {
   return db.prepare(`
     SELECT u.username, MAX(g.score) AS best
@@ -224,9 +218,9 @@ export function getLeaderboard() {
   `).all();
 }
 
-// --- Query per l'autenticazione ---
+// Query autenticazione
 
-// Utente completo (con hash e salt): serve a verificare la password al login.
+// Utente completo (con hash e salt): verifica la password al login.
 export function getUserByUsername(username) {
   return db.prepare('SELECT * FROM users WHERE username = ?').get(username);
 }

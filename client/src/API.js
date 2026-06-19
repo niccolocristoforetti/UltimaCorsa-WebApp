@@ -1,7 +1,6 @@
 const BASE = 'http://localhost:3001/api'
 
-// Ogni funzione lancia un Error se il server risponde con un codice di errore,
-// così i componenti usano solo try/catch senza toccare res.ok o il JSON di errore.
+// I componenti usano solo try/catch senza toccare res.ok o il JSON di errore.
 
 async function login(username, password) {
   const res = await fetch(`${BASE}/sessions`, {

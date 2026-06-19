@@ -8,14 +8,14 @@ function effectClass(effect) {
   return 'neutral'
 }
 
-// Fase di Esecuzione: il percorso è già stato inviato e validato, qui rivelo la cronaca del viaggio tappa per tappa. Eventi e monete arrivano già tutti dal server: questa è solo presentazione, non chiedo nulla tappa per tappa
+// Fase di Esecuzione: presentazione eventi e monete ricevuti dal server
 function ExecutionPhase({ result, onFinished }) {
-  // Quante tappe ho già svelato: parte da 0 e cresce di una ogni secondo finché non le ho mostrate tutte
+  // Quante tappe ho già svelato
   const [shown, setShown] = useState(0)
 
   const legs = result.legs ?? []
 
-  // Svelo una tappa alla volta: se ne mancano, programmo un setTimeout che ne mostra un'altra e lo ripulisco in cleanup (stessa struttura del timer di Pianificazione)
+  // Svelo una tappa alla volta: se ne mancano, programmo un setTimeout che ne mostra un'altra
   useEffect(() => {
     if (shown >= legs.length) return
     const timeout = setTimeout(() => setShown(s => s + 1), 1000)
@@ -33,7 +33,7 @@ function ExecutionPhase({ result, onFinished }) {
     )
   }
 
-  // Bottone abilitato solo a cronaca completata: prima il giocatore guarda il viaggio scorrere
+  // Bottone abilitato solo a cronaca completata
   const done = shown >= legs.length
 
   return (

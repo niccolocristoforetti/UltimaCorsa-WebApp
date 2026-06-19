@@ -12,8 +12,7 @@ import Home from './components/Home'
 function App() {
   const { setUser, loading, setLoading } = useAuth()
 
-  // Al primo render chiedo al server se esiste già una sessione attiva.
-  // Serve per non perdere il login dopo un ricaricamento della pagina.
+  // Al primo render chiedo al server se esiste già una sessione attiva per non perdere il login dopo un ricaricamento della pagina.
   useEffect(() => {
     API.getCurrentUser()
       .then(user => setUser(user))
@@ -21,8 +20,7 @@ function App() {
       .finally(() => setLoading(false))
   }, [setUser, setLoading])
 
-  // Aspetto la risposta del controllo sessione prima di valutare le route protette:
-  // altrimenti un utente già loggato verrebbe rimandato al login per un istante.
+// Aspetto la risposta del controllo sessione prima di valutare le route protette: altrimenti un utente già loggato verrebbe rimandato alla home.
   if (loading) return null
 
   return (

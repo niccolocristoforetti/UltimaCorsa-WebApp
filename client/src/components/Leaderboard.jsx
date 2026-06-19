@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import API from '../API'
 import './Leaderboard.css'
 
-// Classifica generale: un solo dato per giocatore (il suo punteggio migliore), già ordinato in modo decrescente dal server
+// Classifica generale
 // onBack è opzionale: usato da GamePage per tornare a result senza toccare l'URL; se assente (route /leaderboard standalone) torno indietro nella cronologia del browser
 function Leaderboard({ onBack }) {
   const [rows, setRows] = useState(null)

@@ -3,7 +3,7 @@ import API from '../API'
 import NetworkMap from './NetworkMap'
 import './SetupPhase.css'
 
-// Fase di Setup: mostro la rete completa (stazioni + linee), nessun timer, il giocatore parte quando vuole
+// Fase di Setup: mostro la rete completa, il giocatore parte quando vuole
 function SetupPhase({ onReady }) {
   const [network, setNetwork] = useState(null)
 
@@ -13,7 +13,7 @@ function SetupPhase({ onReady }) {
 
   if (!network) return <p>Caricamento rete...</p>
 
-  // Tratte ricavate dalle linee: ogni coppia di stazioni consecutive lungo una linea; servono alla mappa per riconoscere gli interscambi (grado >= 3)
+  // Tratte ricavate dalle linee: ogni coppia di stazioni consecutive lungo una linea; servono alla mappa per riconoscere gli interscambi
   const segments = network.lines.flatMap(l => l.stations.slice(1).map((id, i) => [l.stations[i], id]))
 
   return (

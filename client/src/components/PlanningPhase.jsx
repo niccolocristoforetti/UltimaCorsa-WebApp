@@ -6,7 +6,7 @@ import './PlanningPhase.css'
 
 const segmentKey = (a, b) => (a < b ? `${a}-${b}` : `${b}-${a}`)
 
-// Ricostruisce il percorso (array di id stazione) dalle tratte scelte, nell'ordine in cui sono state cliccate: parto da startId e ad ogni tratta mi sposto sull'estremo diverso dalla stazione in cui mi trovo; se la tratta non la tocca il percorso si spezza lì, e ce ne accorgeremo solo all'invio
+// Ricostruisce il percorso (array di id stazione) dalle tratte scelte, nell'ordine in cui sono state cliccate: parto da startId e ad ogni tratta mi sposto sull'estremo diverso dalla stazione in cui mi trovo. Se una tratta non tocca quella stazione il percorso resta spezzato: non lo controllo qui, lo rifiuta il server alla validazione.
 function buildRoute(selected, startId) {
   const route = [startId]
   for (const [a, b] of selected) {
@@ -16,10 +16,10 @@ function buildRoute(selected, startId) {
   return route
 }
 
-// Fase di Pianificazione: stazioni e tratte SENZA le linee, il giocatore ricostruisce a memoria il percorso entro 90 secondi
+// Fase di Pianificazione: il giocatore ricostruisce a memoria il percorso entro 90 secondi
 function PlanningPhase({ start, end, onSubmit }) {
   const [network, setNetwork] = useState(null)
-  // Tratte scelte finora, nell'ordine di selezione: non un percorso già "risolto", solo l'elenco di click fatti, così posso togliere una tratta da qualsiasi punto
+  // Tratte scelte finora, nell'ordine di selezione
   const [selected, setSelected] = useState([])
   const [timeLeft, setTimeLeft] = useState(90)
   const [sent, setSent] = useState(false)
@@ -28,7 +28,7 @@ function PlanningPhase({ start, end, onSubmit }) {
     API.getNetworkSegments().then(data => setNetwork(data))
   }, [])
 
-  // Countdown: ad ogni render programmo un solo setTimeout che toglie 1 secondo, e lo ripulisco in cleanup prima del render seguente; a 0 invio il percorso così com'è (autosubmit)
+  // Countdown: ad ogni render programmo un solo setTimeout che toglie 1 secondo, e lo ripulisco in cleanup prima del render seguente. A 0 invio il percorso così com'è (autosubmit)
   useEffect(() => {
     if (sent) return
     if (timeLeft <= 0) {
@@ -44,7 +44,7 @@ function PlanningPhase({ start, end, onSubmit }) {
     onSubmit(buildRoute(selected, start.id))
   }
 
-  // Click su una tratta: la toglie se era già scelta (ovunque si trovi nell'elenco), altrimenti la aggiunge in fondo. Può essere qualunque tratta della rete, anche una che non si collega a nulla di già scelto: l'eventuale percorso rotto lo scoprirà solo il server, in fase di invio
+  // Click su una tratta: la toglie se era già scelta (ovunque si trovi nell'elenco), altrimenti la aggiunge in fondo.
   function toggleSegment(a, b) {
     const key = segmentKey(a, b)
     setSelected(s => (

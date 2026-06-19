@@ -6,7 +6,7 @@ import ExecutionPhase from './ExecutionPhase'
 import ResultPage from './ResultPage'
 import Leaderboard from './Leaderboard'
 
-// Tutta la partita vive in questo componente come macchina a stati: setup → planning → execution → result (→ leaderboard interna). Cambio fase = cambio di stato, niente cambi di URL e nessun reload
+// Tutta la partita vive in questo componente come macchina a stati: setup -> planning -> execution -> result (-> leaderboard interna).
 function GamePage() {
   const [phase, setPhase] = useState('setup')
 
@@ -16,7 +16,7 @@ function GamePage() {
   const [end, setEnd] = useState(null)
   const [result, setResult] = useState(null)
 
-  // Setup → Planning. createGame() stampa created_at lato server: è il t0 dei 90 secondi, quindi va chiamato qui e non prima
+  // Setup -> Planning: createGame() stampa created_at lato server. E' il t0 dei 90 secondi, quindi va chiamato qui e non prima
   async function handleReady() {
     const game = await API.createGame()
     setGameId(game.id)
@@ -25,19 +25,19 @@ function GamePage() {
     setPhase('planning')
   }
 
-  // Planning → Execution: PlanningPhase mi passa il percorso scelto (o quello parziale, se è scattato l'autosubmit), io lo invio al server e salvo il risultato
+  // Planning -> Execution: PlanningPhase mi passa il percorso scelto (o quello parziale, se è scattato l'autosubmit), lo invio al server e salvo il risultato
   async function handleSubmit(route) {
     const result = await API.submitRoute(gameId, route)
     setResult(result)
     setPhase('execution')
   }
 
-  // Execution → Result: cronaca rivelata, mostro il punteggio finale.
+  // Execution -> Result: cronaca rivelata, mostro il punteggio finale.
   function handleFinished() {
     setPhase('result')
   }
 
-  // Result → Setup: azzero lo stato e ricomincio da capo.
+  // Result -> Setup: azzero lo stato e ricomincio da capo.
   function handleRestart() {
     setGameId(null)
     setStart(null)
@@ -46,7 +46,7 @@ function GamePage() {
     setPhase('setup')
   }
 
-  // Result → Leaderboard e ritorno: nessun cambio di URL, quindi nessuno smontaggio di GamePage e nessuna perdita di result
+  // Result -> Leaderboard e ritorno: niente cambio URL, così GamePage non si smonta e non perdo result
   function handleShowLeaderboard() {
     setPhase('leaderboard')
   }

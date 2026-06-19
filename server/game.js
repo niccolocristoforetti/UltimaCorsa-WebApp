@@ -1,11 +1,10 @@
 import { lineSegments, interchanges, segmentKey } from './graph.js';
 import { getEvents, getStations } from './db.mjs';
 
-// Esegue il viaggio su un percorso già validato: un evento casuale per tratta,
-// monete da 20 in giù/su, punteggio finale mai negativo (floor a 0).
+// Esegue il viaggio su un percorso già validato: un evento casuale per tratta
 export function playRoute(route) {
   const events = getEvents();
-  // Mappa id->nome costruita una volta: la cronaca porta già i nomi, così il client non deve avere l'intera lista stazioni solo per tradurre gli id
+  // Mappa id->nome costruita una volta
   const nameById = new Map(getStations().map((s) => [s.id, s.name]));
   let coins = 20;
   const legs = [];
@@ -24,14 +23,14 @@ export function playRoute(route) {
   return { legs, score: Math.max(0, coins) };
 }
 
-// Verifica che un percorso (array di id stazione) sia valido:
-//  1) parte da startId,
-//  2) arriva a endId,
-//  3) ogni tratta è un'adiacenza reale,
-//  4) i cambi di linea avvengono solo nelle stazioni di interscambio,
-//  5) nessuna tratta è usata più di una volta (selezionabile una sola volta per partita).
-// La traccia consente in generale di ripetere una STAZIONE (in tratte diverse); su questa rete, che è un albero, ciò non può comunque accadere (servirebbe riusare una tratta).
-// Ritorna true/false.
+/* Verifica che un percorso (array di id stazione) sia valido:
+    1) parte da startId,
+    2) arriva a endId,
+    3) ogni tratta è un'adiacenza reale,
+    4) i cambi di linea avvengono solo nelle stazioni di interscambio,
+    5) nessuna tratta è usata più di una volta (selezionabile una sola volta per partita).
+   La traccia consente in generale di ripetere una STAZIONE (in tratte diverse); su questa rete ciò non può comunque accadere.
+   Ritorna true/false. */
 export function validateRoute(route, startId, endId) {
   // 1-2) deve essere un array con almeno una tratta, con estremi corretti
   if (!Array.isArray(route) || route.length < 2) return false;
@@ -57,7 +56,6 @@ export function validateRoute(route, startId, endId) {
       possible = new Set(lines);             // interscambio: posso cambiare linea liberamente
     } else {
       // stazione normale: devo restare su una linea già in corso (intersezione).
-      // Verifica fatta per requisito della traccia, non perché ci siano segmenti paralleli (la rete non ne ha): con tratte mono-linea l'intersezione è banale.
       possible = new Set([...possible].filter((l) => lines.has(l)));
       if (possible.size === 0) return false; // cambio di linea fuori da un interscambio
     }

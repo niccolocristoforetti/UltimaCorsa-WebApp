@@ -5,7 +5,7 @@ import { AuthProvider } from './contexts/AuthContext.jsx'
 import './index.css'
 import App from './App.jsx'
 
-// AuthProvider è dentro BrowserRouter così i componenti hanno accesso a entrambi i contesti.
+// Sia il router sia AuthProvider avvolgono App.
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter>
