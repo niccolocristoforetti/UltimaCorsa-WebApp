@@ -1,10 +1,12 @@
 import { lineSegments, interchanges, segmentKey } from './graph.js';
-import { getEvents } from './db.mjs';
+import { getEvents, getStations } from './db.mjs';
 
 // Esegue il viaggio su un percorso già validato: un evento casuale per tratta,
 // monete da 20 in giù/su, punteggio finale mai negativo (floor a 0).
 export function playRoute(route) {
   const events = getEvents();
+  // Mappa id->nome costruita una volta: la cronaca porta già i nomi, così il client non deve avere l'intera lista stazioni solo per tradurre gli id
+  const nameById = new Map(getStations().map((s) => [s.id, s.name]));
   let coins = 20;
   const legs = [];
   for (let i = 1; i < route.length; i++) {
@@ -12,7 +14,9 @@ export function playRoute(route) {
     coins += event.effect;
     legs.push({
       from: route[i - 1],
+      fromName: nameById.get(route[i - 1]),
       to: route[i],
+      toName: nameById.get(route[i]),
       event: { description: event.description, effect: event.effect },
       coins,
     });

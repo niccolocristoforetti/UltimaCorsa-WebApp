@@ -1,0 +1,24 @@
+.result-page {
+  width: 100%;
+  max-width: 900px;
+  margin: 32px auto;
+  text-align: center;
+}
+
+.final-score {
+  font-size: 28px;
+  font-weight: bold;
+  margin: 16px 0;
+}
+
+.result-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.result-actions button {
+  padding: 8px 16px;
+}

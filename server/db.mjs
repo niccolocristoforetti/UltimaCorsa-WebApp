@@ -1,7 +1,11 @@
 import Database from 'better-sqlite3';
 import crypto from 'crypto';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-const db = new Database('ultima-corsa.db');
+// Percorso assoluto ancorato a questo file, non relativo alla cwd: evita di creare il DB altrove se lancio il server da una cartella diversa
+const dbPath = path.join(path.dirname(fileURLToPath(import.meta.url)), 'ultima-corsa.db');
+const db = new Database(dbPath);
 db.pragma('foreign_keys = ON');   // SQLite NON applica le FK di default: va acceso a ogni connessione
 
 // --- Schema (6 tabelle) ---

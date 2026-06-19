@@ -1,0 +1,21 @@
+.leaderboard {
+  width: 100%;
+  max-width: 600px;
+  margin: 32px auto;
+}
+
+.leaderboard table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.leaderboard th,
+.leaderboard td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.leaderboard button {
+  margin-top: 20px;
+  padding: 8px 16px;
+}

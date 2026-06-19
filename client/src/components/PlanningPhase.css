@@ -1,7 +1,13 @@
 .planning-phase {
   width: 100%;
   max-width: 900px;
-  margin: 32px auto;
+  margin: 16px auto;
+}
+
+/* Senza linee la mappa di Pianificazione porta meno informazione della Setup: posso restringerla per lasciare spazio sotto a tratte e bottone, senza scroll */
+.planning-phase .network-map {
+  max-height: 50vh;
+  max-width: 660px;
 }
 
 .timer {

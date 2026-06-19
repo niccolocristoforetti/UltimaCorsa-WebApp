@@ -10,7 +10,7 @@ function NavBar() {
   async function handleLogout() {
     await API.logout()
     setUser(null)
-    navigate('/login')
+    navigate('/')
   }
 
   return (

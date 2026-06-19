@@ -2,8 +2,11 @@ import { useState } from 'react'
 import API from '../API'
 import SetupPhase from './SetupPhase'
 import PlanningPhase from './PlanningPhase'
+import ExecutionPhase from './ExecutionPhase'
+import ResultPage from './ResultPage'
+import Leaderboard from './Leaderboard'
 
-// Tutta la partita vive in questo componente come macchina a stati: setup → planning → execution → result. Cambio fase = cambio di stato, niente cambi di URL e nessun reload
+// Tutta la partita vive in questo componente come macchina a stati: setup → planning → execution → result (→ leaderboard interna). Cambio fase = cambio di stato, niente cambi di URL e nessun reload
 function GamePage() {
   const [phase, setPhase] = useState('setup')
 
@@ -43,6 +46,15 @@ function GamePage() {
     setPhase('setup')
   }
 
+  // Result → Leaderboard e ritorno: nessun cambio di URL, quindi nessuno smontaggio di GamePage e nessuna perdita di result
+  function handleShowLeaderboard() {
+    setPhase('leaderboard')
+  }
+
+  function handleBackFromLeaderboard() {
+    setPhase('result')
+  }
+
   if (phase === 'setup')
     return <SetupPhase onReady={handleReady} />
 
@@ -50,20 +62,13 @@ function GamePage() {
     return <PlanningPhase start={start} end={end} onSubmit={handleSubmit} />
 
   if (phase === 'execution')
-    return (
-      <div>
-        <p>[Esecuzione] cronaca tappa per tappa</p>
-        <button onClick={handleFinished}>Vai al risultato</button>
-      </div>
-    )
+    return <ExecutionPhase result={result} onFinished={handleFinished} />
 
   if (phase === 'result')
-    return (
-      <div>
-        <p>[Risultato] punteggio finale</p>
-        <button onClick={handleRestart}>Nuova partita</button>
-      </div>
-    )
+    return <ResultPage result={result} onRestart={handleRestart} onShowLeaderboard={handleShowLeaderboard} />
+
+  if (phase === 'leaderboard')
+    return <Leaderboard onBack={handleBackFromLeaderboard} />
 
   return null
 }

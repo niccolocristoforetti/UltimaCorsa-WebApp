@@ -1,11 +1,13 @@
 import { useEffect } from 'react'
-import { Routes, Route, Link } from 'react-router-dom'
+import { Routes, Route } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext'
 import API from './API'
 import LoginForm from './components/LoginForm'
 import NavBar from './components/NavBar'
 import ProtectedRoute from './components/ProtectedRoute'
 import GamePage from './components/GamePage'
+import Leaderboard from './components/Leaderboard'
+import Home from './components/Home'
 
 function App() {
   const { setUser, loading, setLoading } = useAuth()
@@ -17,7 +19,7 @@ function App() {
       .then(user => setUser(user))
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [])
+  }, [setUser, setLoading])
 
   // Aspetto la risposta del controllo sessione prima di valutare le route protette:
   // altrimenti un utente già loggato verrebbe rimandato al login per un istante.
@@ -29,7 +31,8 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginForm />} />
         <Route path="/play"  element={<ProtectedRoute><GamePage /></ProtectedRoute>} />
-        <Route path="/"      element={<ProtectedRoute><Link to="/play">Gioca</Link></ProtectedRoute>} />
+        <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
+        <Route path="/"      element={<Home />} />
       </Routes>
     </>
   )
