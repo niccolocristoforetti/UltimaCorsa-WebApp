@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuth } from './contexts/AuthContext'
 import API from './API'
 import LoginForm from './components/LoginForm'
@@ -10,7 +10,7 @@ import Leaderboard from './components/Leaderboard'
 import Home from './components/Home'
 
 function App() {
-  const { setUser, loading, setLoading } = useAuth()
+  const { user, setUser, loading, setLoading } = useAuth()
 
   // Al primo render chiedo al server se esiste già una sessione attiva per non perdere il login dopo un ricaricamento della pagina.
   useEffect(() => {
@@ -27,7 +27,7 @@ function App() {
     <>
       <NavBar />
       <Routes>
-        <Route path="/login" element={<LoginForm />} />
+        <Route path="/login" element={user ? <Navigate to="/" /> : <LoginForm />} />
         <Route path="/play"  element={<ProtectedRoute><GamePage /></ProtectedRoute>} />
         <Route path="/leaderboard" element={<ProtectedRoute><Leaderboard /></ProtectedRoute>} />
         <Route path="/"      element={<Home />} />
