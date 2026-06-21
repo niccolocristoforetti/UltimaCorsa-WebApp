@@ -35,14 +35,16 @@ function Home() {
           le linee, con i loro colori. Hai tutto il tempo che vuoi per studiartela.
         </li>
         <li>
-          <strong>Pianificazione.</strong> Le linee colorate scompaiono: vedi solo le stazioni e i
-          collegamenti diretti fra di loro (le "tratte"). Devi ricostruire a memoria il percorso da una
-          stazione di partenza a una di arrivo, scegliendo le tratte giuste, entro 90 secondi.
+          <strong>Pianificazione.</strong> Le linee colorate scompaiono dalla mappa: restano solo le
+          stazioni con i loro nomi. A parte, hai l'elenco di tutte le tratte (i collegamenti diretti tra due
+          stazioni vicine): devi ricostruire a memoria il percorso dalla stazione di partenza a quella di
+          arrivo, scegliendo le tratte giuste una dopo l'altra, in ordine, entro 90 secondi.
         </li>
         <li>
           <strong>Esecuzione.</strong> Se il percorso è corretto, scopri tappa per tappa cosa è successo
           durante il viaggio: ogni tratta può portare un piccolo imprevisto che fa guadagnare o perdere
-          monete (anche nessuno, a volte va tutto bene).
+          monete (anche nessuno, a volte va tutto bene). Se invece il percorso è sbagliato o lo invii fuori
+          tempo, la corsa non parte e chiudi la partita con 0 monete.
         </li>
         <li>
           <strong>Risultato.</strong> Vedi quante monete ti restano e puoi confrontarti con tutti gli

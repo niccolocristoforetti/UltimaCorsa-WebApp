@@ -45,6 +45,13 @@
   color: #000000;
 }
 
+/* In dark mode il nero dell'evento neutro viene messo bianco */
+@media (prefers-color-scheme: dark) {
+  .leg-effect.neutral {
+    color: #ffffff;
+  }
+}
+
 .execution-phase button {
   margin-top: 20px;
   padding: 8px 16px;

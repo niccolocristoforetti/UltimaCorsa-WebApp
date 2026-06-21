@@ -20,6 +20,7 @@
 
 .station-label {
   font-size: 13px;
+  fill: var(--text-h);
 }
 
 .station-label.interchange {
