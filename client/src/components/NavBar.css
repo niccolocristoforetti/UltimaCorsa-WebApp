@@ -6,6 +6,23 @@ nav {
   border-bottom: 1px solid var(--border);
 }
 
+nav .nav-links {
+  grid-column: 1;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+nav .nav-links a {
+  text-decoration: none;
+  color: inherit;
+}
+
+nav .nav-links a.active {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
 nav .title {
   grid-column: 2;
   font-weight: bold;
